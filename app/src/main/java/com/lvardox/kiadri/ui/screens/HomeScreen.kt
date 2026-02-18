@@ -65,7 +65,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
         cameraLauncher.launch(uri)
     }
 
-    if (tasks.isEmpty()) {
+    if (tasks.none { !it.isCompleted }) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
