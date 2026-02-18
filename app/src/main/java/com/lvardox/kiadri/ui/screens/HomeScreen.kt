@@ -120,7 +120,8 @@ fun HomeScreen(tasks: MutableList<Task>) {
                         if (index != -1) {
                             tasks[index] = tasks[index].copy(
                                 isCompleted = true,
-                                photoUri = photoUri.toString()
+                                photoUri = photoUri.toString(),
+                                completedAt = System.currentTimeMillis()
                             )
                         }
                         showConfirmDialog = false

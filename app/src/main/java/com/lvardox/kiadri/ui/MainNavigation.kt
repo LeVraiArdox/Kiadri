@@ -28,6 +28,7 @@ import com.lvardox.kiadri.models.Task
 import com.lvardox.kiadri.ui.screens.HomeScreen
 
 import com.lvardox.kiadri.ui.components.AddTaskDialog
+import com.lvardox.kiadri.ui.screens.HistoryScreen
 
 @Composable
 fun MainNavigation() {
@@ -70,7 +71,7 @@ fun MainNavigation() {
             if (currentScreen == "home") {
                 HomeScreen(tasks)
             } else {
-                // HistoryScreen()
+                HistoryScreen(tasks.filter { it.isCompleted })
             }
         }
         if (showDialog) {
