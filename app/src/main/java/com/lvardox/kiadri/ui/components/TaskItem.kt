@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Done
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -53,7 +54,7 @@ fun TaskItem(task: Task, onCameraClick: () -> Unit) {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Icon(appIcons.Done, "Valider")
+                Icon(appIcons.CameraAlt, "Valider")
             }
         }
     }
