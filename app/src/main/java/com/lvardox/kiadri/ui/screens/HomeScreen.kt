@@ -107,7 +107,11 @@ fun HomeScreen(tasks: MutableList<Task>) {
                             modifier = Modifier.fillMaxWidth().height(200.dp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("C'est bon, on valide l'activité ?")
+                        Text(
+                            text= "C'est bon, on valide l'activité ?",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
                     }
                 },
                 confirmButton = {
@@ -120,10 +124,10 @@ fun HomeScreen(tasks: MutableList<Task>) {
                             )
                         }
                         showConfirmDialog = false
-                    }) { Text("C'est okay !") }
+                    }) { Text("Carrément !") }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showConfirmDialog = false }) { Text("Bof, on la refait !") }
+                    TextButton(onClick = { showConfirmDialog = false }) { Text("Bof, on la refait") }
                 }
             )
         }
