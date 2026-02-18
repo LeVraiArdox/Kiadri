@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,9 +34,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 
 import com.lvardox.kiadri.models.Task
 import com.lvardox.kiadri.ui.components.TaskItem
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 import java.io.File
 
@@ -45,6 +51,11 @@ fun HomeScreen(tasks: MutableList<Task>) {
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var showConfirmDialog by remember { mutableStateOf(false) }
     var currentTask by remember { mutableStateOf<Task?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
+    val db = Firebase.firestore
+    val storage = Firebase.storage
+
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
@@ -116,15 +127,33 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        val index = tasks.indexOf(currentTask)
-                        if (index != -1) {
-                            tasks[index] = tasks[index].copy(
-                                isCompleted = true,
-                                photoUri = photoUri.toString(),
-                                completedAt = System.currentTimeMillis()
-                            )
+                        coroutineScope.launch {
+                            try {
+                                val taskToUpdate = currentTask ?: return@launch
+
+                                val storageRef = storage.reference.child("souvenirs/${taskToUpdate.id}.jpg")
+                                storageRef.putFile(photoUri!!).await()
+
+                                val downloadUrl = storageRef.downloadUrl.await().toString()
+
+                                val finalTask = taskToUpdate.copy(
+                                    photoUri = downloadUrl,
+                                    isCompleted = true,
+                                    completedAt = System.currentTimeMillis()
+                                )
+
+                                db.collection("tasks").document(finalTask.id).set(finalTask).await()
+
+                                val index = tasks.indexOf(taskToUpdate)
+                                if (index != -1) {
+                                    tasks[index] = finalTask
+                                }
+
+                                showConfirmDialog = false
+                            } catch (e: Exception) {
+                                println("Erreur firebase: ${e.message}")
+                            }
                         }
-                        showConfirmDialog = false
                     }) { Text("Carrément !") }
                 },
                 dismissButton = {
