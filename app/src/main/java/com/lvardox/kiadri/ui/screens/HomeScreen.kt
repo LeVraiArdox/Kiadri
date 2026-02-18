@@ -114,7 +114,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 },
                 confirmButton = {
                     Button(onClick = {
-                        val index = tasks.indexOf(currentTask)
+                        val index = tasks.indexOfFirst { it.id == currentTask?.id }
                         if (index != -1) {
                             tasks[index] = tasks[index].copy(
                                 isCompleted = true,
