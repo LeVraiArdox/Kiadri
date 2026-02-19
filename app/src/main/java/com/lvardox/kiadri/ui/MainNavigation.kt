@@ -1,11 +1,13 @@
 package com.lvardox.kiadri.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Checklist
 import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -33,17 +36,17 @@ import com.lvardox.kiadri.ui.screens.HistoryScreen
 @Composable
 fun MainNavigation() {
     var currentScreen by remember { mutableStateOf("home") }
-
     val appIcons = Icons.Rounded
-
     val tasks = remember { mutableStateListOf<Task>() }
     var showDialog by remember { mutableStateOf(false) }
-
     val db = Firebase.firestore
+    var isLoading by remember { mutableStateOf(true) }
+
 
     LaunchedEffect(Unit) {
         db.collection("tasks").addSnapshotListener {
             snapshot, error ->
+            isLoading = false
             if (error != null) {
                 println("Erreur firebase: ${error.message}")
                 return@addSnapshotListener
@@ -91,10 +94,16 @@ fun MainNavigation() {
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            if (currentScreen == "home") {
-                HomeScreen(tasks)
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
             } else {
-                HistoryScreen(tasks.filter { it.completed })
+                if (currentScreen == "home") {
+                    HomeScreen(tasks)
+                } else {
+                    HistoryScreen(tasks.filter { it.completed })
+                }
             }
         }
         if (showDialog) {

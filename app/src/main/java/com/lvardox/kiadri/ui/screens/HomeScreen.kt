@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Checklist
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,6 +57,8 @@ fun HomeScreen(tasks: MutableList<Task>) {
     val coroutineScope = rememberCoroutineScope()
     val db = Firebase.firestore
     val storage = Firebase.storage
+
+    var isUploading by remember { mutableStateOf(false) }
 
 
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -127,6 +131,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 },
                 confirmButton = {
                     Button(onClick = {
+                        isUploading = true
                         coroutineScope.launch {
                             try {
                                 val taskToUpdate = currentTask ?: return@launch
@@ -152,12 +157,24 @@ fun HomeScreen(tasks: MutableList<Task>) {
                                 showConfirmDialog = false
                             } catch (e: Exception) {
                                 println("Erreur firebase: ${e.message}")
+                            } finally {
+                                isUploading = false
                             }
                         }
-                    }) { Text("Carrément !") }
+                    }) {
+                        if (isUploading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Text("Carrément !")
+                        }
+                    }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showConfirmDialog = false }) { Text("Bof, on la refait") }
+                    TextButton(onClick = { showConfirmDialog = false }, enabled = !isUploading) { Text("Bof, on la refait") }
                 }
             )
         }
