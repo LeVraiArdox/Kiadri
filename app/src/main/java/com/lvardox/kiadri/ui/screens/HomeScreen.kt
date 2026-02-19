@@ -1,6 +1,7 @@
 package com.lvardox.kiadri.ui.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -199,6 +200,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
 
                                 showConfirmDialog = false
                             } catch (e: Exception) {
+                                Toast.makeText(context, "Erreur de serveur !!", Toast.LENGTH_SHORT).show()
                                 println("Erreur firebase: ${e.message}")
                             } finally {
                                 isUploading = false

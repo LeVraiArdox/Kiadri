@@ -1,5 +1,6 @@
 package com.lvardox.kiadri.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
@@ -43,6 +45,7 @@ fun MainNavigation() {
     val db = Firebase.firestore
     var isLoading by remember { mutableStateOf(true) }
     val auth = Firebase.auth
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         auth.signInAnonymously().addOnCompleteListener { task ->
@@ -66,6 +69,7 @@ fun MainNavigation() {
                 }
             } else {
                 isLoading = false
+                Toast.makeText(context, "Erreur de serveurs !!", Toast.LENGTH_SHORT).show()
                 println("Erreur firebase: ${task.exception?.message}")
             }
         }
@@ -122,6 +126,7 @@ fun MainNavigation() {
                         .document(newTask.id)
                         .set(newTask)
                         .addOnFailureListener { e ->
+                            Toast.makeText(context, "Impossible d'ajouter la tâche", Toast.LENGTH_SHORT).show()
                             println("Impossible d'ajouter la tâche: ${e.message}")
                         }
 

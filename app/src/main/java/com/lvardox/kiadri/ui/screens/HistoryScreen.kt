@@ -1,5 +1,6 @@
 package com.lvardox.kiadri.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
@@ -33,6 +35,8 @@ import com.lvardox.kiadri.ui.components.ScrapbookCard
 @Composable
 fun HistoryScreen(completedTasks: List<Task>) {
     var expandedTask by remember { mutableStateOf<Task?>(null) }
+
+    val context = LocalContext.current
 
     val db = Firebase.firestore
     val storage = Firebase.storage
@@ -81,6 +85,7 @@ fun HistoryScreen(completedTasks: List<Task>) {
                     try {
                         storage.getReferenceFromUrl(uri).delete()
                     } catch (e: Exception) {
+                        Toast.makeText(context, "Erreur de serveur !!", Toast.LENGTH_SHORT).show()
                         println("Erreur firebase: ${e.message}")
                     }
                 }
