@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 
 import com.lvardox.kiadri.models.Task
@@ -41,25 +42,31 @@ fun MainNavigation() {
     var showDialog by remember { mutableStateOf(false) }
     val db = Firebase.firestore
     var isLoading by remember { mutableStateOf(true) }
-
+    val auth = Firebase.auth
 
     LaunchedEffect(Unit) {
-        db.collection("tasks").addSnapshotListener {
-            snapshot, error ->
-            isLoading = false
-            if (error != null) {
-                println("Erreur firebase: ${error.message}")
-                return@addSnapshotListener
-            }
+        auth.signInAnonymously().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                db.collection("tasks").addSnapshotListener { snapshot, error ->
+                    isLoading = false
+                    if (error != null) {
+                        println("Erreur firebase: ${error.message}")
+                        return@addSnapshotListener
+                    }
 
-            if (snapshot != null) {
-                tasks.clear()
-                for (document in snapshot.documents) {
-                    val task = document.toObject(Task::class.java)
-                    if (task != null) {
-                        tasks.add(task)
+                    if (snapshot != null) {
+                        tasks.clear()
+                        for (document in snapshot.documents) {
+                            val task = document.toObject(Task::class.java)
+                            if (task != null) {
+                                tasks.add(task)
+                            }
+                        }
                     }
                 }
+            } else {
+                isLoading = false
+                println("Erreur firebase: ${task.exception?.message}")
             }
         }
     }
