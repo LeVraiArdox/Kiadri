@@ -9,6 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 
 import com.lvardox.kiadri.ui.MainNavigation
+import com.lvardox.kiadri.ui.theme.KiadriTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

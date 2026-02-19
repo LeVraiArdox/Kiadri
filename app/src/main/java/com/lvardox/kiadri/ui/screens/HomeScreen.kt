@@ -76,7 +76,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
         cameraLauncher.launch(uri)
     }
 
-    if (tasks.none { !it.isCompleted }) {
+    if (tasks.isEmpty() || tasks.all { it.completed }) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -101,7 +101,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(tasks.filter { !it.isCompleted }) { task ->
+            items(tasks.filter { !it.completed }) { task ->
                 TaskItem(task, onCameraClick = { launchCamera(task) })
             }
         }
@@ -138,7 +138,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
 
                                 val finalTask = taskToUpdate.copy(
                                     photoUri = downloadUrl,
-                                    isCompleted = true,
+                                    completed = true,
                                     completedAt = System.currentTimeMillis()
                                 )
 
