@@ -2,6 +2,7 @@ package com.lvardox.kiadri.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,8 @@ import androidx.compose.material.icons.rounded.Checklist
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -54,6 +57,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var showConfirmDialog by remember { mutableStateOf(false) }
     var currentTask by remember { mutableStateOf<Task?>(null) }
+    var taskForPhotoChoice by remember { mutableStateOf<Task?>(null) }
 
     val coroutineScope = rememberCoroutineScope()
     val db = Firebase.firestore
@@ -66,6 +70,16 @@ fun HomeScreen(tasks: MutableList<Task>) {
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
             if (success) showConfirmDialog = true
+        }
+    )
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                photoUri = uri
+                showConfirmDialog = true
+            }
         }
     )
 
@@ -107,8 +121,36 @@ fun HomeScreen(tasks: MutableList<Task>) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(tasks.filter { !it.completed }) { task ->
-                TaskItem(task, onCameraClick = { launchCamera(task) })
+                TaskItem(task, onCameraClick = {
+                    currentTask = task
+                    taskForPhotoChoice = task
+                    }
+                )
             }
+        }
+
+        taskForPhotoChoice?.let { task ->
+            AlertDialog(
+                onDismissRequest = { taskForPhotoChoice = null },
+                title = { Text("Ajouter une preuve") },
+                text = { Text("D'ou viens ce chef-d'oeuvre ?") },
+                confirmButton =  {
+                    Button(onClick = {
+                        taskForPhotoChoice = null
+                        launchCamera(task)
+                    }) {
+                        Text("Appareil photo")
+                    }
+                },
+                dismissButton = {
+                    FilledTonalButton(onClick = {
+                        taskForPhotoChoice = null
+                        galleryLauncher.launch(PickVisualMediaRequest(mediaType = ActivityResultContracts.PickVisualMedia.ImageOnly))
+                    }) {
+                        Text("Galerie")
+                    }
+                }
+            )
         }
 
         if (showConfirmDialog && photoUri != null) {
