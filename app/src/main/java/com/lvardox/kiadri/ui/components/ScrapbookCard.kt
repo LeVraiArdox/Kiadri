@@ -36,7 +36,7 @@ fun ScrapbookCard(task: Task) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
     ) {
         Column(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
@@ -56,13 +56,14 @@ fun ScrapbookCard(task: Task) {
             Text(
                 text = task.title,
                 style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onTertiaryContainer,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
             )
             Text(
                 text = dateStr,
                 style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.outline,
+                color = MaterialTheme.colorScheme.tertiary,
                 textAlign = TextAlign.Center
             )
         }
