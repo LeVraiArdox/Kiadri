@@ -1,5 +1,6 @@
 package com.lvardox.kiadri.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -34,7 +35,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun ScrapbookCard(task: Task) {
+fun ScrapbookCard(task: Task, onClick: () -> Unit) {
     val rotation = remember { (-4..4).random().toFloat() }
 
     val dateStr = task.completedAt?.let {
@@ -42,7 +43,7 @@ fun ScrapbookCard(task: Task) {
     } ?: "Inconnue"
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
     ) {

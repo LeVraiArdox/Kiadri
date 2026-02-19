@@ -17,14 +17,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lvardox.kiadri.models.Task
+import com.lvardox.kiadri.ui.components.ExpandedMemoryDialog
 import com.lvardox.kiadri.ui.components.ScrapbookCard
 
 @Composable
 fun HistoryScreen(completedTasks: List<Task>) {
+    var extendedTask by remember { mutableStateOf<Task?>(null) }
+
     if (completedTasks.isEmpty()) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -52,8 +59,18 @@ fun HistoryScreen(completedTasks: List<Task>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(completedTasks) { task ->
-                ScrapbookCard(task)
+                ScrapbookCard(
+                    task = task,
+                    onClick = { extendedTask = task }
+                )
             }
         }
+    }
+
+    extendedTask?.let { task ->
+        ExpandedMemoryDialog(
+            task = task,
+            onDismiss = { extendedTask = null }
+        )
     }
 }
