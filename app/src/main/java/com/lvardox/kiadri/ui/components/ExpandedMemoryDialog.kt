@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -82,7 +83,17 @@ fun ExpandedMemoryDialog(task: Task, onDismiss: () -> Unit, onDelete: (Task) -> 
                     contentDescription = null,
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxSize(),
-                    loading = { CircularProgressIndicator(modifier = Modifier.align(Alignment.Center)) }
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
                 )
 
                 IconButton(
@@ -118,7 +129,17 @@ fun ExpandedMemoryDialog(task: Task, onDismiss: () -> Unit, onDelete: (Task) -> 
                         .aspectRatio(1f)
                         .clickable { showFullScreen = true }
                         .clip(MaterialTheme.shapes.medium),
-                    loading = { CircularProgressIndicator(modifier = Modifier.size(32.dp)) }
+                    loading = {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(32.dp)
+                            )
+                        }
+                    }
                 )
 
                 Spacer(modifier = Modifier.size(24.dp))
