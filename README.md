@@ -4,6 +4,8 @@ An Android app designed to track friendship or couple activities, validate tasks
 
 Because a simple shared text file was just too easy.
 
+<img width="192" height="192" alt="image" src="https://github.com/user-attachments/assets/05960598-9672-4bd6-96a3-7170eb0f448b" />
+
 ## Features
 
 * **Real-Time Sync:** Add, validate, and delete tasks instantly across devices using Firestore.
