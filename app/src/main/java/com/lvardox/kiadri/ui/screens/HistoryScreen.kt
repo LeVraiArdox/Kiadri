@@ -24,13 +24,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 import com.lvardox.kiadri.models.Task
 import com.lvardox.kiadri.ui.components.ExpandedMemoryDialog
 import com.lvardox.kiadri.ui.components.ScrapbookCard
 
 @Composable
 fun HistoryScreen(completedTasks: List<Task>) {
-    var extendedTask by remember { mutableStateOf<Task?>(null) }
+    var expandedTask by remember { mutableStateOf<Task?>(null) }
+
+    val db = Firebase.firestore
+    val storage = Firebase.storage
 
     if (completedTasks.isEmpty()) {
         Box(
@@ -61,16 +67,28 @@ fun HistoryScreen(completedTasks: List<Task>) {
             items(completedTasks) { task ->
                 ScrapbookCard(
                     task = task,
-                    onClick = { extendedTask = task }
+                    onClick = { expandedTask = task }
                 )
             }
         }
     }
 
-    extendedTask?.let { task ->
+    expandedTask?.let { task ->
         ExpandedMemoryDialog(
             task = task,
-            onDismiss = { extendedTask = null }
+            onDismiss = { expandedTask = null },
+            onDelete = { taskToDelete ->
+                taskToDelete.photoUri?.let { uri ->
+                    try {
+                        storage.getReferenceFromUrl(uri).delete()
+                    } catch (e: Exception) {
+                        println("Erreur firebase: ${e.message}")
+                    }
+                }
+
+                db.collection("tasks").document(taskToDelete.id).delete()
+                expandedTask = null
+            }
         )
     }
 }

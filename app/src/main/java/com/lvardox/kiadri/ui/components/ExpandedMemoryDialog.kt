@@ -1,9 +1,14 @@
 package com.lvardox.kiadri.ui.components
 
+import android.app.DownloadManager
+import android.content.Context
+import android.os.Environment
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,11 +19,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,11 +55,13 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.text.format
+import androidx.core.net.toUri
 
 @Composable
-fun ExpandedMemoryDialog(task: Task, onDismiss: () -> Unit) {
+fun ExpandedMemoryDialog(task: Task, onDismiss: () -> Unit, onDelete: (Task) -> Unit) {
     val context = LocalContext.current
     var showFullScreen by remember { mutableStateOf(false) }
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
 
     var dateStr = task.completedAt?.let {
         SimpleDateFormat("dd MMMM yyyy 'à' HH:mm", Locale.FRANCE).format(Date(it))
@@ -123,12 +137,67 @@ fun ExpandedMemoryDialog(task: Task, onDismiss: () -> Unit) {
                     color = MaterialTheme.colorScheme.primary,
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                TextButton(onDismiss) {
-                    Text("Fermer")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    FilledTonalIconButton(
+                        onClick = {
+                            val request = DownloadManager.Request(task.photoUri?.toUri())
+                                .setTitle(task.title)
+                                .setDescription("Téléchargement de l'image de ${task.title}")
+                                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                                .setDestinationInExternalPublicDir(
+                                    Environment.DIRECTORY_PICTURES,
+                                    "Kiadri_${System.currentTimeMillis()}.jpg"
+                                )
+
+                            val manager =
+                                context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                            manager.enqueue(request)
+                        }
+                    ) {
+                        Icon(Icons.Default.Download, contentDescription = "Télécharger")
+                    }
+
+                    FilledTonalIconButton(
+                        onClick = { showDeleteConfirmation = true },
+                        colors = IconButtonDefaults.filledTonalIconButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        )
+                    ) {
+                        Icon(Icons.Default.Delete, contentDescription = "Supprimer")
+                    }
                 }
             }
         }
+    }
+
+    if (showDeleteConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDeleteConfirmation = false },
+            title = { Text("Supprimer l'image ?") },
+            text = { Text("C'est définitif. La photo sera pulvérisée des serveurs à tout jamais. Tu es sûr de ton coup ?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDeleteConfirmation = false
+                        onDelete(task)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                    )
+                ) {
+                    Text("Adieu")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteConfirmation = false }) {
+                    Text("Non")
+                }
+            }
+        )
     }
 }
