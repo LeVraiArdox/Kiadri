@@ -27,7 +27,6 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import coil.compose.SubcomposeAsyncImage
 import com.lvardox.kiadri.models.Task
 import java.text.SimpleDateFormat

@@ -22,7 +22,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -43,12 +42,10 @@ import coil.compose.AsyncImage
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
-
 import com.lvardox.kiadri.models.Task
 import com.lvardox.kiadri.ui.components.TaskItem
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-
 import java.io.File
 
 @Composable
