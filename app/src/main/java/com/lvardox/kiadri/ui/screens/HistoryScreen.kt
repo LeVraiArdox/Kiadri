@@ -1,5 +1,6 @@
 package com.lvardox.kiadri.ui.screens
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -86,7 +87,7 @@ fun HistoryScreen(completedTasks: List<Task>) {
                         storage.getReferenceFromUrl(uri).delete()
                     } catch (e: Exception) {
                         Toast.makeText(context, "Erreur de serveur !!", Toast.LENGTH_SHORT).show()
-                        println("Erreur firebase: ${e.message}")
+                        Log.i("Erreur firebase: ", "${e.message}")
                     }
                 }
 

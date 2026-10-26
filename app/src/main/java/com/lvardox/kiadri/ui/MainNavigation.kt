@@ -1,5 +1,6 @@
 package com.lvardox.kiadri.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -53,7 +54,7 @@ fun MainNavigation() {
                 db.collection("tasks").addSnapshotListener { snapshot, error ->
                     isLoading = false
                     if (error != null) {
-                        println("Erreur firebase: ${error.message}")
+                        Log.i("Erreur firebase: ", "${error.message}")
                         return@addSnapshotListener
                     }
 
@@ -70,7 +71,7 @@ fun MainNavigation() {
             } else {
                 isLoading = false
                 Toast.makeText(context, "Erreur de serveurs !!", Toast.LENGTH_SHORT).show()
-                println("Erreur firebase: ${task.exception?.message}")
+                Log.i("Erreur firebase: ", "Erreur de serveur")
             }
         }
     }
@@ -127,7 +128,7 @@ fun MainNavigation() {
                         .set(newTask)
                         .addOnFailureListener { e ->
                             Toast.makeText(context, "Impossible d'ajouter la tâche", Toast.LENGTH_SHORT).show()
-                            println("Impossible d'ajouter la tâche: ${e.message}")
+                            Log.i("Erreur", "Impossible d'ajouter la tâche: ${e.message}")
                         }
 
                     showDialog = false
