@@ -125,8 +125,8 @@ fun HomeScreen(tasks: MutableList<Task>) {
             }
             .let { list ->
                 when (sortOption) {
-                    TaskSortOption.NEWEST -> list.sortedByDescending { it.createdAt ?: 0L }
-                    TaskSortOption.OLDEST -> list.sortedBy { it.createdAt ?: 0L }
+                    TaskSortOption.NEWEST -> list.sortedBy { it.createdAt ?: 0L }
+                    TaskSortOption.OLDEST -> list.sortedByDescending { it.createdAt ?: 0L }
                     TaskSortOption.TITLE_ASC -> list.sortedBy { it.title.lowercase() }
                     TaskSortOption.TITLE_DESC -> list.sortedByDescending { it.title.lowercase() }
                 }
