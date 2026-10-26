@@ -5,5 +5,6 @@ data class Task(
     val title: String = "",
     val completed: Boolean = false,
     val photoUri: String? = null,
-    val completedAt: Long? = null
+    val completedAt: Long? = null,
+    val createdAt: Long? = System.currentTimeMillis()
 )
