@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -60,7 +57,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.lvardox.kiadri.models.Task
-import com.lvardox.kiadri.ui.components.TaskItem
+import com.lvardox.kiadri.ui.components.SegmentedListGroup
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.File
@@ -262,21 +259,14 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 }
             }
         } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(filteredAndSortedTasks, key = { it.id }) { task ->
-                    TaskItem(
-                        task = task,
-                        onCameraClick = {
-                            currentTask = task
-                            taskForPhotoChoice = task
-                        }
-                    )
-                }
-            }
+            SegmentedListGroup(
+                items = filteredAndSortedTasks,
+                onItemActionClick = {
+                    taskForPhotoChoice = it
+                    launchCamera(it)
+                },
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 
