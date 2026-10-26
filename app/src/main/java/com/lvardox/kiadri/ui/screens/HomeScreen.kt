@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import coil.compose.AsyncImage
 import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.storage
 import com.lvardox.kiadri.models.Task
@@ -331,7 +332,8 @@ fun HomeScreen(tasks: MutableList<Task>) {
                             val finalTask = taskToUpdate.copy(
                                 photoUri = downloadUrl,
                                 completed = true,
-                                completedAt = System.currentTimeMillis()
+                                completedAt = System.currentTimeMillis(),
+                                completedBy = Firebase.auth.currentUser?.uid
                             )
 
                             db.collection("tasks").document(finalTask.id).set(finalTask).await()

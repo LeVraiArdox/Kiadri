@@ -30,6 +30,12 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.messaging.messaging
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 
 import com.lvardox.kiadri.models.Task
 import com.lvardox.kiadri.ui.screens.HomeScreen
@@ -48,9 +54,33 @@ fun MainNavigation() {
     val auth = Firebase.auth
     val context = LocalContext.current
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (!isGranted) {
+                Log.i("FCM", "Notification permission denied")
+            }
+        }
+    )
+
     LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        
         auth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
+                val uid = auth.currentUser?.uid
+                if (uid != null) {
+                    Firebase.messaging.token.addOnCompleteListener { tokenTask ->
+                        if (tokenTask.isSuccessful) {
+                            val token = tokenTask.result
+                            db.collection("users").document(uid)
+                                .set(mapOf("fcmToken" to token), SetOptions.merge())
+                        }
+                    }
+                }
+
                 db.collection("tasks").addSnapshotListener { snapshot, error ->
                     isLoading = false
                     if (error != null) {
@@ -122,7 +152,7 @@ fun MainNavigation() {
             AddTaskDialog(
                 onDismiss = {showDialog = false},
                 onConfirm = { title ->
-                    val newTask = Task(title = title)
+                    val newTask = Task(title = title, createdBy = auth.currentUser?.uid)
                     db.collection("tasks")
                         .document(newTask.id)
                         .set(newTask)
