@@ -263,6 +263,7 @@ fun HomeScreen(tasks: MutableList<Task>) {
             SegmentedListGroup(
                 items = filteredAndSortedTasks,
                 onItemActionClick = {
+                    currentTask = it
                     taskForPhotoChoice = it
                 },
                 onItemDeleteClick = { taskToDelete ->
