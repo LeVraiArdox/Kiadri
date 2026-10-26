@@ -1,4 +1,4 @@
-const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentCreated, onDocumentUpdated, onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
 
@@ -94,5 +94,50 @@ exports.notifyOnTaskValidated = onDocumentUpdated("tasks/{taskId}", async (event
         } catch (error) {
             logger.error("Error sending messages:", error);
         }
+    }
+});
+
+/**
+ * Triggered when a task is deleted.
+ */
+exports.notifyOnTaskDeleted = onDocumentDeleted("tasks/{taskId}", async (event) => {
+    const taskData = event.data.data();
+    if (!taskData) return;
+
+    // Ignore completed tasks being deleted from history
+    if (taskData.completed) return;
+
+    const title = taskData.title || "Une activité";
+
+    const usersSnapshot = await admin.firestore().collection("users").get();
+
+    const tokens = [];
+    usersSnapshot.forEach(doc => {
+        const userData = doc.data();
+        if (userData.fcmToken) {
+            tokens.push(userData.fcmToken);
+        }
+    });
+
+    if (tokens.length === 0) {
+        logger.info("No tokens found to send deleted task notification.");
+        return;
+    }
+
+    const payload = {
+        notification: {
+            title: "Activité supprimée 🗑️",
+            body: `L'activité "${title}" a été retirée du programme.`,
+        }
+    };
+
+    try {
+        const response = await admin.messaging().sendEachForMulticast({
+            tokens: tokens,
+            notification: payload.notification
+        });
+        logger.info(`Successfully sent ${response.successCount} messages on delete.`);
+    } catch (error) {
+        logger.error("Error sending messages:", error);
     }
 });

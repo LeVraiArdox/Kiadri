@@ -265,7 +265,16 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 onItemActionClick = {
                     taskForPhotoChoice = it
                 },
-                modifier = Modifier.padding(16.dp)
+                onItemDeleteClick = { taskToDelete ->
+                    db.collection("tasks").document(taskToDelete.id).delete()
+                        .addOnFailureListener { e ->
+                            Toast.makeText(context, "Impossible de supprimer la tâche", Toast.LENGTH_SHORT).show()
+                            Log.i("Erreur firebase", "Impossible de supprimer la tâche: ${e.message}")
+                        }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp)
             )
         }
     }

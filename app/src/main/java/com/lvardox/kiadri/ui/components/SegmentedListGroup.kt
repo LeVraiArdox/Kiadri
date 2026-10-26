@@ -3,8 +3,8 @@ package com.lvardox.kiadri.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material3.HorizontalDivider
@@ -18,15 +18,13 @@ import com.lvardox.kiadri.models.Task
 fun SegmentedListGroup(
     items: List<Task>,
     onItemActionClick: (Task) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onItemDeleteClick: ((Task) -> Unit)? = null
 ) {
     if (items.isEmpty()) return
 
-    Column(modifier = modifier
-        .fillMaxWidth()
-        .verticalScroll(rememberScrollState())
-    ) {
-        items.forEachIndexed { index, item ->
+    LazyColumn(modifier = modifier.fillMaxWidth()) {
+        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
             val position = when {
                 items.size == 1 -> SegmentPosition.SINGLE
                 index == 0 -> SegmentPosition.TOP
@@ -34,19 +32,22 @@ fun SegmentedListGroup(
                 else -> SegmentPosition.MIDDLE
             }
 
-            SegmentedListItem(
-                title = item.title,
-                leadingIcon = Icons.Rounded.Check,
-                position = position,
-                onButtonClick = { onItemActionClick(item) }
-            )
-
-            if (index < items.lastIndex) {
-                HorizontalDivider(
-                    modifier = Modifier.padding(start = 2.dp),
-                    color = Color.Transparent,
-                    thickness = 2.dp
+            Column(modifier = Modifier.animateItem()) {
+                SegmentedListItem(
+                    title = item.title,
+                    leadingIcon = Icons.Rounded.Check,
+                    position = position,
+                    onButtonClick = { onItemActionClick(item) },
+                    onSwipeRight = { onItemDeleteClick?.invoke(item) }
                 )
+
+                if (index < items.lastIndex) {
+                    HorizontalDivider(
+                        modifier = Modifier.padding(start = 2.dp),
+                        color = Color.Transparent,
+                        thickness = 2.dp
+                    )
+                }
             }
         }
     }
