@@ -37,5 +37,18 @@ To compile this project locally, you'll need to show Google your credentials:
 5. Download your `google-services.json` file and drop it into the `app/` directory.
 6. Build the APK.
 
+## Notifications Setup (Cloud Functions)
+
+The app supports real-time push notifications when a new activity is added or when an activity is validated. This relies on Firebase Cloud Messaging (FCM) and Cloud Functions.
+
+1. Ensure your Firebase project is on the **Blaze (Pay-as-you-go)** plan (required for Cloud Functions, though typical usage fits well within the free tier).
+2. Install the Firebase CLI if you haven't already: `npm install -g firebase-tools`
+3. Login to Firebase via your terminal: `npx firebase login`
+4. From the root of this project, deploy the backend scripts:
+   ```bash
+   npx firebase deploy --only functions
+   ```
+*(Note: If this is your first time deploying Gen 2 functions, it may fail initially with an Eventarc permission error. This is normal. Wait 3-5 minutes for Google Cloud to provision the background permissions, then run the deploy command again.)*
+
 ## Credits
 - Gemini to generate this readme
