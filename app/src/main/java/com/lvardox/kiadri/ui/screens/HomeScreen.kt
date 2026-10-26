@@ -264,7 +264,6 @@ fun HomeScreen(tasks: MutableList<Task>) {
                 items = filteredAndSortedTasks,
                 onItemActionClick = {
                     taskForPhotoChoice = it
-                    launchCamera(it)
                 },
                 modifier = Modifier.padding(16.dp)
             )
